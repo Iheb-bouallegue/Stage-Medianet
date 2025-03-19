@@ -31,6 +31,7 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;  // Le rôle de l'utilisateur
+    private boolean active = true;
 
     public Role getRole() {
         return role;
@@ -62,6 +63,14 @@ public class User {
 
     public void setEmail(@NotNull(message = "Email cannot be null") @Email(message = "Email should be valid") String email) {
         this.email = email;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public @NotNull(message = "Password cannot be null") @Size(min = 6, message = "Password must be at least 6 characters") String getPassword() {

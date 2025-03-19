@@ -1,16 +1,22 @@
 package com.example.medianet.stagemedianet.Services;
 
+
+import com.example.medianet.stagemedianet.entity.Permission;
+import com.example.medianet.stagemedianet.entity.Role;
 import com.example.medianet.stagemedianet.entity.User;
-import com.example.medianet.stagemedianet.reposotory.UserRepository;
-import lombok.RequiredArgsConstructor;
+import com.example.medianet.stagemedianet.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.ArrayList;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 
@@ -23,15 +29,25 @@ public class CustomUserDetailsService  implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
 
+
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        // Récupère le nom du rôle de l'utilisateur (assurez-vous que le rôle est bien un objet 'Role' et que son nom est accessible)
-        String roleName = user.getRole().getName();  // Assurez-vous que 'getRole' renvoie un objet 'Role' et non une chaîne
 
-        // Crée une autorité basée sur le nom du rôle (assurez-vous que 'roleName' est bien une chaîne de caractères)
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(roleName)));
+        // Récupérer le rôle de l'utilisateur
+        Role role = user.getRole();
+
+        // Récupérer les permissions du rôle
+        Set<Permission> permissions = role.getPermissions();
+
+        // Créer une liste d'autorités basée sur les permissions
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Permission permission : permissions) {
+            authorities.add(new SimpleGrantedAuthority(permission.getNom()));
+        }
+
+        // Retourner l'utilisateur avec ses autorités
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 }
 

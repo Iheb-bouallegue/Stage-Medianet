@@ -2,8 +2,8 @@ package com.example.medianet.stagemedianet.controller;
 
 import com.example.medianet.stagemedianet.entity.Role;
 import com.example.medianet.stagemedianet.entity.User;
-import com.example.medianet.stagemedianet.reposotory.RoleRepository;
-import com.example.medianet.stagemedianet.reposotory.UserRepository;
+import com.example.medianet.stagemedianet.repository.RoleRepository;
+import com.example.medianet.stagemedianet.repository.UserRepository;
 import jakarta.validation.Valid;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -43,14 +45,14 @@ public class RegistrationLoginController {
         }
         // Vérifier si le rôle existe
         String roleName = user.getRole().getName();  // Récupère le rôle depuis l'utilisateur
-        Role role = roleRepository.findByName(roleName);
+        Optional<Role> role = roleRepository.findByName(roleName);
 
-        if (role == null) {
+        if (role.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid role specified");
         }
 
         // Assigner le rôle à l'utilisateur
-        user.setRole(role);
+        user.setRole(role.orElse(null));
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return ResponseEntity.ok(userRepository.save(user));
