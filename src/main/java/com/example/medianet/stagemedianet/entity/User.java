@@ -28,7 +28,7 @@ public class User {
     @NotNull(message = "Password cannot be null")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;  // Le rôle de l'utilisateur
     private boolean active = true;

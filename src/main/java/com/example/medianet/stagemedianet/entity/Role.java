@@ -13,7 +13,8 @@ public class Role {
     private String name;
     @OneToMany(mappedBy = "role")
     private Set<User> users;
-    @ManyToMany
+
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),
