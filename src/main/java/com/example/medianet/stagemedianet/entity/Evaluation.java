@@ -1,11 +1,7 @@
 package com.example.medianet.stagemedianet.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
 @Entity
 public class Evaluation {
@@ -13,32 +9,28 @@ public class Evaluation {
     @GeneratedValue
     private Long id;
 
-    private String title;
-    private String comments;
-    private int score; // par exemple : sur 10 ou sur 100
-    private LocalDate date;
+    @ManyToOne
+    @JoinColumn(name = "evaluated_user_id")
+    private User evaluatedUser;
 
     @ManyToOne
-    private User user;
+    @JoinColumn(name = "evaluator_id")
+    private User evaluator;
 
-    public Evaluation() {
-    }
-    public Evaluation(String title, String comments, int score, LocalDate date, User user) {
-        this.title = title;
-        this.comments = comments;
-        this.score = score;
-        this.date = date;
-        this.user = user;
+    private String title;
+    private String comments;
+    private int score;
 
-    }
+    public Evaluation() {}
 
-    public Evaluation(Long id, String title, String comments, int score, LocalDate date, User user) {
+
+    public Evaluation(Long id, User evaluatedUser, User evaluator, String title, String comments, int score) {
         this.id = id;
+        this.evaluatedUser = evaluatedUser;
+        this.evaluator = evaluator;
         this.title = title;
         this.comments = comments;
         this.score = score;
-        this.date = date;
-        this.user = user;
     }
 
     public Long getId() {
@@ -49,20 +41,28 @@ public class Evaluation {
         this.id = id;
     }
 
+    public User getEvaluatedUser() {
+        return evaluatedUser;
+    }
+
+    public void setEvaluatedUser(User evaluatedUser) {
+        this.evaluatedUser = evaluatedUser;
+    }
+
+    public User getEvaluator() {
+        return evaluator;
+    }
+
+    public void setEvaluator(User evaluator) {
+        this.evaluator = evaluator;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
     }
 
     public String getComments() {
@@ -73,19 +73,11 @@ public class Evaluation {
         this.comments = comments;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public int getScore() {
+        return score;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setScore(int score) {
+        this.score = score;
     }
 }

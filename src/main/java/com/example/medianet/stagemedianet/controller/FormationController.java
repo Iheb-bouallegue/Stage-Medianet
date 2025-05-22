@@ -31,7 +31,7 @@ public class FormationController {
         return service.save(formation);
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Formation> updateFormation(@PathVariable Long id, @RequestBody Formation formation) {
         return service.findById(id).map(f -> {
             formation.setId(id);
@@ -39,10 +39,28 @@ public class FormationController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public void deleteFormation(@PathVariable long id) {
         service.deleteById(id);
     }
+    @PutMapping("/reserver/{id}")
+    public ResponseEntity<Formation> reserverUnePlace(@PathVariable Long id, @RequestParam Long utilisateurId) {
+        try {
+            return service.reserverPlace(id, utilisateurId)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+    }
+    @GetMapping("/mes-reservations/{utilisateurId}")
+    public List<Formation> getMesFormationsReservees(@PathVariable Long utilisateurId) {
+        return service.getFormationsReserveesParUtilisateur(utilisateurId);
+    }
+
+
+
 
 
 }

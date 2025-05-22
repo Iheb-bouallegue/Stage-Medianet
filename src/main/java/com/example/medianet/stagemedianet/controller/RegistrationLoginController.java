@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -62,6 +63,14 @@ public class RegistrationLoginController {
 
         // Assigner le rôle à l'utilisateur
         user.setRole(role.orElse(null));
+// Récupérer et associer le manager (si renseigné)
+        if (user.getManager() != null && user.getManager().getId() != null) {
+            Optional<User> manager = userRepository.findById(user.getManager().getId());
+            if (manager.isEmpty()) {
+                return ResponseEntity.badRequest().body("Manager not found");
+            }
+            user.setManager(manager.get());
+        }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return ResponseEntity.ok(userRepository.save(user));
@@ -115,6 +124,11 @@ public class RegistrationLoginController {
         // La réponse est symbolique ici, car le token reste valide jusqu’à son expiration.
         return ResponseEntity.ok("Déconnecté avec succès.");
     }
-
+    @GetMapping("/users/manager/{id}")
+    public List<User> getUsersByManager(@PathVariable Long id) {
+        return userRepository.findByManager_Id(id);
     }
+
+
+}
 

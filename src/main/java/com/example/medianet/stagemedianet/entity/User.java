@@ -1,12 +1,16 @@
 package com.example.medianet.stagemedianet.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name="users")
@@ -32,6 +36,30 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;  // Le rôle de l'utilisateur
     private boolean active = true;
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    @JsonBackReference
+    private User manager;
+    // Les subordonnés de ce manager
+    @OneToMany(mappedBy = "manager")
+    @JsonManagedReference
+    private List<User> teamMembers;
+
+    public List<User> getTeamMembers() {
+        return teamMembers;
+    }
+
+    public void setTeamMembers(List<User> teamMembers) {
+        this.teamMembers = teamMembers;
+    }
+
+    public User getManager() {
+        return manager;
+    }
+
+    public void setManager(User manager) {
+        this.manager = manager;
+    }
 
     public Role getRole() {
         return role;

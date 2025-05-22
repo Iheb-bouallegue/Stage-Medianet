@@ -7,14 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 
 @Table(name="Formation")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Formation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +25,43 @@ public class Formation {
     private String description;
     private LocalDate dateDebut;
     private LocalDate dateFin;
+    @Column(name = "places_disponibles")
+    private Integer placesDisponibles = 0;
+
+    @ManyToMany
+    @JoinTable(
+            name = "formation_utilisateur",
+            joinColumns = @JoinColumn(name = "formation_id"),
+            inverseJoinColumns = @JoinColumn(name = "utilisateur_id")
+    )
+    private List<User> utilisateursReserves = new ArrayList<>();
+
+    public List<User> getUtilisateursReserves() {
+        return utilisateursReserves;
+    }
+
+    public void setUtilisateursReserves(List<User> utilisateursReserves) {
+        this.utilisateursReserves = utilisateursReserves;
+    }
+
+    public Formation(Long id, String titre, String description, LocalDate dateDebut, LocalDate dateFin, int placesDisponibles) {
+        this.id = id;
+        this.titre = titre;
+        this.description = description;
+        this.dateDebut = dateDebut;
+        this.dateFin = dateFin;
+        this.placesDisponibles = placesDisponibles;
+    }
+
+    public Integer getPlacesDisponibles() {
+        return placesDisponibles != null ? placesDisponibles : 0;
+    }
+
+
+    public void setPlacesDisponibles(Integer placesDisponibles) {
+        this.placesDisponibles = placesDisponibles;
+    }
+
 
     public LocalDate getDateDebut() {
         return dateDebut;

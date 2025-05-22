@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(customUserDetailsService, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/v1/logout","/api/v1/login", "/api/v1/register","/api/users/delete/{userId}","/api/users/disable/{userId}","/api/users/update/{Id}","/api/formation/save","/api/formation/update/{id}","/api/formation/delete/{id}","/api/formation/get/{id}"," /api/evaluations/user/{userId}","/api/evaluations/save","/api/formation/getall","/api/users/all","/api/profile/save","/api/profile/upload-image/{id}","/api/profile/me")  // Permet l'accès aux routes de login et de registration
+                                .requestMatchers("/api/v1/logout","/api/v1/login", "/api/v1/register","/api/users/delete/{userId}","/api/users/team/{managerId}","/api/users/disable/{userId}","/api/users/managers","/api/users/update/{Id}","/api/formation/save","/api/formation/update/{id}","/api/formation/delete/{id}","/api/formation/get/{id}"," /api/evaluations/user/{userId}","/api/evaluations/save","/api/formation/getall","/api/formation/reserver/{id}","/api/users/all","/api/profile/save","/api/profile/upload-image/{id}","/api/profile/me","/api/evaluations/mes-evaluations","/api/formation/mes-reservations/{utilisateurId}")  // Permet l'accès aux routes de login et de registration
                                 .permitAll() // Permet à tout utilisateur d'accéder sans authentification
                                 .requestMatchers("/api/v1/employees/**")  // Restrict accès à /api/v1/employees/** selon les permissions
                                 .hasAnyAuthority("CAN_DELETE_EMPLOYEE", "CAN_DISABLE_EMPLOYEE") // Accès limité aux utilisateurs avec les bonnes permissions
@@ -44,36 +44,7 @@ public class SecurityConfig {
 
                 )
                 .build();
-//        http
-//                .authorizeRequests()
-//                // Accès aux pages d'administration
-//                .antMatchers("/admin/**").hasAuthority("CAN_MANAGE_SYSTEM")
-//
-//                // Accès aux pages utilisateurs
-//                .antMatchers("/user/**").hasAuthority("CAN_VIEW_USERS")
-//
-//                // Accès aux formations
-//                .antMatchers("/training/**").hasAuthority("CAN_VIEW_TRAININGS")
-//
-//                // Accès à la gestion des objectifs pour le manager
-//                .antMatchers("/goal/**").hasAuthority("CAN_CREATE_GOAL")
-//
-//                // Accès à la gestion des évaluations
-//                .antMatchers("/evaluation/**").hasAuthority("CAN_CREATE_EVALUATION")
-//
-//                // Accès aux données des employés pour RH
-//                .antMatchers("/employee/**").hasAuthority("CAN_MANAGE_EMPLOYEES")
-//
-//                // Accès au tableau de bord (par exemple)
-//                .antMatchers("/dashboard/**").hasAuthority("CAN_ACCESS_DASHBOARD")
-//
-//                // Toute autre page nécessite une authentification
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
-//                .and()
-//                .logout()
-//                .permitAll();
+
     }
 
     @Bean
