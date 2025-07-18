@@ -1,5 +1,6 @@
 package com.example.medianet.stagemedianet.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,24 @@ public class UserProfile {
     private String githubUrl;
     @Column(columnDefinition = "TEXT")
     private String imageUrl; // URL de l'image de profil
+    @JsonIgnore
+    public  boolean isProfileCompleted() {
+        return fullName != null && !fullName.isBlank()
+                && email != null && !email.isBlank()
+                && age > 0
+                && phoneNumber != null && !phoneNumber.isBlank()
+                && university != null && !university.isBlank()
+                && degree != null && !degree.isBlank()
+                && fieldOfStudy != null && !fieldOfStudy.isBlank()
+                && experience != null && !experience.isBlank()
+                && currentPosition != null && !currentPosition.isBlank()
+                && skills != null && !skills.isBlank()
+                && languages != null && !languages.isBlank()
+                && linkedinUrl != null && !linkedinUrl.isBlank()
+                && githubUrl != null && !githubUrl.isBlank()
+                && imageUrl != null && !imageUrl.isBlank();
+    }
+
 
     public String getImageUrl() {
         return imageUrl;

@@ -1,9 +1,12 @@
 package com.example.medianet.stagemedianet.controller;
 
 import com.example.medianet.stagemedianet.Configuration.JwtUtils;
+import com.example.medianet.stagemedianet.Services.EmailService;
 import com.example.medianet.stagemedianet.entity.Role;
 import com.example.medianet.stagemedianet.entity.User;
+import com.example.medianet.stagemedianet.entity.UserProfile;
 import com.example.medianet.stagemedianet.repository.RoleRepository;
+import com.example.medianet.stagemedianet.repository.UserProfileRepository;
 import com.example.medianet.stagemedianet.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -42,28 +45,28 @@ public class RegistrationLoginController {
     private RoleRepository roleRepository;
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserProfileRepository profileRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid User user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.status(400).body("username already exists");
         }
-        // Vérifier si l'email existe déjà
+
         if (userRepository.findByEmail(user.getEmail()) != null) {
             return ResponseEntity.status(401).body("Email already exists");
-
         }
-        // Vérifier si le rôle existe
-        String roleName = user.getRole().getName();  // Récupère le rôle depuis l'utilisateur
-        Optional<Role> role = roleRepository.findByName(roleName);
 
+        String roleName = user.getRole().getName();
+        Optional<Role> role = roleRepository.findByName(roleName);
         if (role.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid role specified");
         }
+        user.setRole(role.get());
 
-        // Assigner le rôle à l'utilisateur
-        user.setRole(role.orElse(null));
-// Récupérer et associer le manager (si renseigné)
         if (user.getManager() != null && user.getManager().getId() != null) {
             Optional<User> manager = userRepository.findById(user.getManager().getId());
             if (manager.isEmpty()) {
@@ -72,10 +75,19 @@ public class RegistrationLoginController {
             user.setManager(manager.get());
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return ResponseEntity.ok(userRepository.save(user));
+        // ✅ Sauvegarder temporairement le mot de passe en clair pour l'e-mail
+        String rawPassword = user.getPassword();
+        user.setPassword(passwordEncoder.encode(rawPassword));
 
+        // ✅ Enregistrement de l'utilisateur
+        User savedUser = userRepository.save(user);
+
+        // ✅ Envoi de l'e-mail avec le mot de passe en clair
+        emailService.sendRegistrationEmail(savedUser.getEmail(), savedUser.getUsername(), rawPassword);
+
+        return ResponseEntity.ok(savedUser);
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
@@ -88,15 +100,27 @@ public class RegistrationLoginController {
             if (authentication.isAuthenticated()) {
                 // Rechercher l'utilisateur dans la base de données avec son username
                 User authenticatedUser = userRepository.findByUsername(user.getUsername())
-                        .orElseThrow(() -> new RuntimeException("User not found")); // Utilisation de orElseThrow sur l'Optional
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                // Vérifier si l'utilisateur est actif
+                if (!authenticatedUser.isActive()) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body("Compte utilisateur désactivé. Contactez l'administrateur.");
+                }
+                // Récupérer le UserProfile à partir de userId
+                Optional<UserProfile> profileOpt = profileRepository.findByUserId(authenticatedUser.getId());
+                boolean profileCompleted = profileOpt.map(UserProfile::isProfileCompleted).orElse(false);
 
                 // Extraire le rôle de l'utilisateur authentifié
                 String roleName = authenticatedUser.getRole().getName();
 
                 // Préparer les données pour générer le token
                 Map<String, Object> authData = new HashMap<>();
-                authData.put("token", jwtUtils.generateToken(authenticatedUser.getId(), authenticatedUser.getUsername(), roleName,authenticatedUser.getEmail()));
+                authData.put("token", jwtUtils.generateToken(authenticatedUser.getId(), authenticatedUser.getUsername(), roleName, authenticatedUser.getEmail()));
                 authData.put("type", "Bearer");
+                authData.put("profileCompleted", profileCompleted);
+
+
 
                 // Retourner la réponse avec le token
                 return ResponseEntity.ok(authData);

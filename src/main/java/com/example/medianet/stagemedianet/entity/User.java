@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -44,6 +45,45 @@ public class User {
     @OneToMany(mappedBy = "manager")
     @JsonManagedReference
     private List<User> teamMembers;
+
+    public User() {
+    }
+
+    // User.java
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "token_expiry")
+    private LocalDateTime tokenExpiry;
+
+    public User(Long id, String username, String email, String password, Role role, boolean active, List<User> teamMembers, String resetToken, LocalDateTime tokenExpiry, User manager) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.active = active;
+        this.teamMembers = teamMembers;
+        this.resetToken = resetToken;
+        this.tokenExpiry = tokenExpiry;
+        this.manager = manager;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getTokenExpiry() {
+        return tokenExpiry;
+    }
+
+    public void setTokenExpiry(LocalDateTime tokenExpiry) {
+        this.tokenExpiry = tokenExpiry;
+    }
 
     public List<User> getTeamMembers() {
         return teamMembers;

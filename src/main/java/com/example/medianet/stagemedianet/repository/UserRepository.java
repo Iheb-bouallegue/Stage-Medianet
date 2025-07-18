@@ -18,5 +18,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findAllManagers();
 
     List<User> findByManagerId(Long managerId);
-
+    Optional<User> findByResetToken(String token);
+    long countByActiveTrue();
+    long countByActiveFalse();
 }

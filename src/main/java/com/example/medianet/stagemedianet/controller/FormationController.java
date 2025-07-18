@@ -59,7 +59,11 @@ public class FormationController {
         return service.getFormationsReserveesParUtilisateur(utilisateurId);
     }
 
-
+    @GetMapping("/suggestion/{userId}")
+    public ResponseEntity<List<Formation>> suggérerFormations(@PathVariable Long userId) {
+        List<Formation> formations = service.suggérerFormationsPour(userId);
+        return ResponseEntity.ok(formations);
+    }
 
 
 

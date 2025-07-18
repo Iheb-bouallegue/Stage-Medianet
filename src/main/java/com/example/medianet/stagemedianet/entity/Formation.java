@@ -23,6 +23,9 @@ public class Formation {
 
     private String titre;
     private String description;
+    private String domaine;  // Exemple : "Java", "Leadership", "Communication"
+    private String niveau;   // Exemple : "Débutant", "Intermédiaire", "Avancé"
+    private String cible;    // Exemple : "Développeur", "Manager", "RH"
     private LocalDate dateDebut;
     private LocalDate dateFin;
     @Column(name = "places_disponibles")
@@ -41,6 +44,43 @@ public class Formation {
     }
 
     public void setUtilisateursReserves(List<User> utilisateursReserves) {
+        this.utilisateursReserves = utilisateursReserves;
+    }
+
+    public String getDomaine() {
+        return domaine;
+    }
+
+    public void setDomaine(String domaine) {
+        this.domaine = domaine;
+    }
+
+    public String getNiveau() {
+        return niveau;
+    }
+
+    public void setNiveau(String niveau) {
+        this.niveau = niveau;
+    }
+
+    public String getCible() {
+        return cible;
+    }
+
+    public void setCible(String cible) {
+        this.cible = cible;
+    }
+
+    public Formation(Long id, String titre, String description, String domaine, String niveau, String cible, LocalDate dateDebut, LocalDate dateFin, Integer placesDisponibles, List<User> utilisateursReserves) {
+        this.id = id;
+        this.titre = titre;
+        this.description = description;
+        this.domaine = domaine;
+        this.niveau = niveau;
+        this.cible = cible;
+        this.dateDebut = dateDebut;
+        this.dateFin = dateFin;
+        this.placesDisponibles = placesDisponibles;
         this.utilisateursReserves = utilisateursReserves;
     }
 

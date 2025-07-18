@@ -12,7 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -36,6 +39,17 @@ public class UserMangement {
     public void disableUser(@PathVariable Long userId) {
         userService.disableUser(userId);
     }
+    @PatchMapping("/{id}/enable")
+    public ResponseEntity<?> enableUser(@PathVariable Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        User user = optionalUser.get();
+        user.setActive(true);
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
     @PutMapping("/update/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
         User user = userService.updateUser(id, updatedUser);
@@ -56,6 +70,7 @@ public class UserMangement {
     public List<User> getTeam(@PathVariable Long managerId) {
         return userRepository.findByManagerId(managerId);
     }
+
 
 
 
